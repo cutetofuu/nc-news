@@ -3,6 +3,7 @@ const { checkServer, getTopics } = require("./controllers/topics.controller");
 const {
   getArticles,
   getOneArticle,
+  getArticleComments,
 } = require("./controllers/articles.controller");
 const {
   handlePSQL400s,
@@ -19,6 +20,8 @@ app.get("/api/topics", getTopics);
 app.get("/api/articles", getArticles);
 
 app.get("/api/articles/:article_id", getOneArticle);
+
+app.get("/api/articles/:article_id/comments", getArticleComments);
 
 app.use(handlePSQL400s);
 

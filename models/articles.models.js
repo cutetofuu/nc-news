@@ -41,3 +41,25 @@ exports.fetchOneArticle = (article_id) => {
       }
     });
 };
+
+exports.fetchArticleComments = (article_id) => {
+  return db
+    .query(
+      `
+        SELECT 
+            comments.comment_id,
+            comments.votes,
+            comments.created_at,
+            comments.author,
+            articles.body,
+            articles.article_id
+        FROM comments
+        JOIN articles ON comments.article_id = articles.article_id
+        WHERE articles.article_id = $1
+    `,
+      [article_id]
+    )
+    .then(({ rows }) => {
+      return rows;
+    });
+};
