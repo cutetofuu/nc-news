@@ -12,7 +12,11 @@ exports.getArticles = (req, res, next) => {
 
 exports.getOneArticle = (req, res, next) => {
   const { article_id } = req.params;
-  fetchOneArticle(article_id).then((article) => {
-    res.status(200).send({ article });
-  });
+  fetchOneArticle(article_id)
+    .then((article) => {
+      res.status(200).send({ article });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
