@@ -53,3 +53,35 @@ describe("topics", () => {
     });
   });
 });
+
+describe("articles", () => {
+  describe("GET /api/articles/:article_id", () => {
+    it("200: responds with an object", () => {
+      return request(app)
+        .get("/api/articles/4")
+        .expect(200)
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article).toBeInstanceOf(Object);
+        });
+    });
+    it("200: responds with an article with the correct keys", () => {
+      return request(app)
+        .get("/api/articles/4")
+        .expect(200)
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            body: expect.any(String),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+          });
+        });
+    });
+  });
+});
