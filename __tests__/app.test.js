@@ -86,5 +86,20 @@ describe("articles", () => {
           });
         });
     });
+    it("200: sorts articles by date in descending order", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          const copyArticles = [...articles];
+          const sortedArticles = copyArticles.sort((articleA, articleB) => {
+            return (
+              new Date(articleB.created_at) - new Date(articleA.created_at)
+            );
+          });
+          expect(articles).toEqual(sortedArticles);
+        });
+    });
   });
 });
