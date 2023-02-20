@@ -178,5 +178,36 @@ describe("articles", () => {
           });
         });
     });
+    it("200: sorts comments by most recent first", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+          const copyComments = [...comments];
+          const sortedComments = copyComments.sort((commentA, commentB) => {
+            return (
+              new Date(commentB.created_at) - new Date(commentA.created_at)
+            );
+          });
+          expect(comments).toEqual(sortedComments);
+        });
+    });
+    it("400: invalid article id given", () => {
+      return request(app)
+        .get("/api/articles/pickle/comments")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    it("404: valid but non-existent article id given", () => {
+      return request(app)
+        .get("/api/articles/999/comments")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("No article found");
+        });
+    });
   });
 });
