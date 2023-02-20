@@ -5,6 +5,8 @@ const {
   getOneArticle,
 } = require("./controllers/articles.controller");
 const {
+  handlePSQL400s,
+  handleCustomErrors,
   handle500Statuses,
 } = require("./controllers/error-handling.controller");
 
@@ -17,6 +19,10 @@ app.get("/api/topics", getTopics);
 app.get("/api/articles", getArticles);
 
 app.get("/api/articles/:article_id", getOneArticle);
+
+app.use(handlePSQL400s);
+
+app.use(handleCustomErrors);
 
 app.use(handle500Statuses);
 
