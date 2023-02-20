@@ -11,3 +11,32 @@ beforeEach(() => {
 afterAll(() => {
   return db.end();
 });
+
+describe("topics", () => {
+  describe("GET /api/topics", () => {
+    it("200: responds with an array", () => {
+      return request(app)
+        .get("/api/topics")
+        .expect(200)
+        .then(({ body }) => {
+          const { topics } = body;
+          expect(topics).toBeInstanceOf(Array);
+        });
+    });
+    it("200: responds with all topics with the correct keys", () => {
+      return request(app)
+        .get("/api/topics")
+        .expect(200)
+        .then(({ body }) => {
+          const { topics } = body;
+          expect(topics).toHaveLength(3);
+          topics.forEach((topic) => {
+            expect(topic).toMatchObject({
+              slug: expect.any(String),
+              description: expect.any(String),
+            });
+          });
+        });
+    });
+  });
+});
