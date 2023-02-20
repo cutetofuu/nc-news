@@ -3,7 +3,7 @@ const { checkServer, getTopics } = require("./controllers/topics.controller");
 const { getArticles } = require("./controllers/articles.controller");
 const {
   handle500Statuses,
-} = require("./controllers/error-handling-controller");
+} = require("./controllers/error-handling.controller");
 
 const app = express();
 
