@@ -12,6 +12,19 @@ afterAll(() => {
   return db.end();
 });
 
+describe("app", () => {
+  describe("GET /api", () => {
+    it("200: responds with a server ok message", () => {
+      return request(app)
+        .get("/api")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Server is working fine");
+        });
+    });
+  });
+});
+
 describe("topics", () => {
   describe("GET /api/topics", () => {
     it("200: responds with an array", () => {
