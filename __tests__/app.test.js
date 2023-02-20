@@ -53,3 +53,53 @@ describe("topics", () => {
     });
   });
 });
+
+describe("articles", () => {
+  describe("GET /api/articles", () => {
+    it("200: responds with an array", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles).toBeInstanceOf(Array);
+        });
+    });
+    it("200: responds with all the articles with the correct keys", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles).toHaveLength(12);
+          articles.forEach((article) => {
+            expect(article).toMatchObject({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(Number),
+            });
+          });
+        });
+    });
+    it("200: sorts articles by date in descending order", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          const copyArticles = [...articles];
+          const sortedArticles = copyArticles.sort((articleA, articleB) => {
+            return (
+              new Date(articleB.created_at) - new Date(articleA.created_at)
+            );
+          });
+          expect(articles).toEqual(sortedArticles);
+        });
+    });
+  });
+});
