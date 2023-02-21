@@ -289,8 +289,8 @@ describe("articles", () => {
     });
     it("400: invalid comment object sent", () => {
       const newComment = {
-        username: "cutetofuu",
-        body: 32558685037,
+        username: "rogersop",
+        body: null,
       };
       return request(app)
         .post("/api/articles/7/comments")
@@ -324,6 +324,19 @@ describe("articles", () => {
         .expect(404)
         .then(({ body }) => {
           expect(body.msg).toBe("No article found");
+        });
+    });
+    it("404: username given does not exist", () => {
+      const newComment = {
+        username: "cutetofuu",
+        body: "This is an article! :)",
+      };
+      return request(app)
+        .post("/api/articles/7/comments")
+        .send(newComment)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Username does not exist");
         });
     });
   });

@@ -4,6 +4,7 @@ const {
   fetchArticleComments,
   selectArticleById,
   addComment,
+  selectUsername,
 } = require("../models/articles.models");
 
 exports.getArticles = (req, res, next) => {
@@ -48,6 +49,9 @@ exports.postComment = (req, res, next) => {
   const newComment = req.body;
 
   selectArticleById(article_id)
+    .then(() => {
+      return selectUsername(newComment);
+    })
     .then(() => {
       return addComment(article_id, newComment);
     })
