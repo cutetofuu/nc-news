@@ -149,6 +149,78 @@ describe("articles", () => {
     });
   });
 
+  describe("GET /api/articles/:article_id/comments", () => {
+    it("200: returns an array", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+          expect(comments).toBeInstanceOf(Array);
+        });
+    });
+    it("200: responds with all of an article's comments with the correct keys", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+          expect(comments).toHaveLength(11);
+          comments.forEach((comment) => {
+            expect(comment).toMatchObject({
+              comment_id: expect.any(Number),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+              author: expect.any(String),
+              body: expect.any(String),
+              article_id: expect.any(Number),
+            });
+          });
+        });
+    });
+    it("200: sorts comments by most recent first", () => {
+      return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+          const copyComments = [...comments];
+          const sortedComments = copyComments.sort((commentA, commentB) => {
+            return (
+              new Date(commentB.created_at) - new Date(commentA.created_at)
+            );
+          });
+          expect(comments).toEqual(sortedComments);
+        });
+    });
+    it("400: invalid article id given", () => {
+      return request(app)
+        .get("/api/articles/pickle/comments")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    it("404: valid but non-existent article id given", () => {
+      return request(app)
+        .get("/api/articles/999/comments")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("No article found");
+        });
+    });
+    it("200: responds with an empty array when given a valid article id with no comments", () => {
+      return request(app)
+        .get("/api/articles/7/comments")
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+          expect(comments).toHaveLength(0);
+          expect(comments).toEqual([]);
+        });
+    });
+  });
+
   describe("POST /api/articles/:article_id/comments", () => {
     it("201: responds with a comment object", () => {
       const newComment = {

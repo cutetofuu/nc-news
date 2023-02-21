@@ -42,6 +42,48 @@ exports.fetchOneArticle = (article_id) => {
     });
 };
 
+exports.fetchArticleComments = (article_id) => {
+  return db
+    .query(
+      `
+        SELECT 
+            comments.comment_id,
+            comments.votes,
+            comments.created_at,
+            comments.author,
+            articles.body,
+            articles.article_id
+        FROM comments
+        JOIN articles ON comments.article_id = articles.article_id
+        WHERE articles.article_id = $1
+        ORDER BY comments.created_at DESC
+    `,
+      [article_id]
+    )
+    .then(({ rows }) => {
+      return rows;
+    });
+};
+
+exports.selectArticleById = (article_id) => {
+  let queryString = `SELECT * FROM articles`;
+  const queryParams = [];
+
+  if (article_id !== undefined) {
+    queryString += ` WHERE article_id = $1`;
+    queryParams.push(article_id);
+  }
+
+  return db.query(queryString, queryParams).then((result) => {
+    const { rowCount } = result;
+    if (rowCount === 0) {
+      return Promise.reject({ status: 404, msg: "No article found" });
+    } else {
+      return result.rows[0];
+    }
+  });
+};
+
 exports.addComment = (article_id, newComment) => {
   const { body, username } = newComment;
 

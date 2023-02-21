@@ -1,6 +1,8 @@
 const {
   fetchArticles,
   fetchOneArticle,
+  fetchArticleComments,
+  selectArticleById,
   addComment,
 } = require("../models/articles.models");
 
@@ -25,6 +27,22 @@ exports.getOneArticle = (req, res, next) => {
     });
 };
 
+exports.getArticleComments = (req, res, next) => {
+  const { article_id } = req.params;
+
+  const commentsPromise = fetchArticleComments(article_id);
+  const checkArticle = selectArticleById(article_id);
+
+  Promise.all([commentsPromise, checkArticle])
+    .then((promisesResult) => {
+      const comments = promisesResult[0];
+      res.status(200).send({ comments });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
 exports.postComment = (req, res, next) => {
   const { article_id } = req.params;
   const newComment = req.body;
@@ -35,6 +53,5 @@ exports.postComment = (req, res, next) => {
     })
     .catch((err) => {
       console.log(err);
-      next(err);
     });
 };

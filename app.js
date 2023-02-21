@@ -3,6 +3,7 @@ const { checkServer, getTopics } = require("./controllers/topics.controller");
 const {
   getArticles,
   getOneArticle,
+  getArticleComments,
   postComment,
 } = require("./controllers/articles.controller");
 const {
@@ -22,6 +23,8 @@ app.get("/api/topics", getTopics);
 app.get("/api/articles", getArticles);
 
 app.get("/api/articles/:article_id", getOneArticle);
+
+app.get("/api/articles/:article_id/comments", getArticleComments);
 
 app.post("/api/articles/:article_id/comments", postComment);
 
