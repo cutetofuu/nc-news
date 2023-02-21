@@ -341,7 +341,7 @@ describe("articles", () => {
     });
   });
 
-  describe.only("GET /api/users", () => {
+  describe("GET /api/users", () => {
     it("200: responds with an array", () => {
       return request(app)
         .get("/api/users")
