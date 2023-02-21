@@ -221,12 +221,131 @@ describe("articles", () => {
     });
   });
 
+  describe("POST /api/articles/:article_id/comments", () => {
+    it("201: responds with a comment object", () => {
+      const newComment = {
+        username: "lurker",
+        body: "This is the best article ever!!!",
+      };
+      return request(app)
+        .post("/api/articles/7/comments")
+        .send(newComment)
+        .expect(201)
+        .then(({ body }) => {
+          const { comment } = body;
+          expect(comment).toBeInstanceOf(Object);
+        });
+    });
+    it("201: responds with a comment object with the correct keys", () => {
+      const newComment = {
+        username: "lurker",
+        body: "This is the best article ever!!!",
+      };
+      return request(app)
+        .post("/api/articles/7/comments")
+        .send(newComment)
+        .expect(201)
+        .then(({ body }) => {
+          const { comment } = body;
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            article_id: expect.any(Number),
+            author: expect.any(String),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            body: expect.any(String),
+          });
+        });
+    });
+    it("201: responds with the comment object that has been sent", () => {
+      const newComment = {
+        username: "lurker",
+        body: "This is the best article ever!!!",
+      };
+      return request(app)
+        .post("/api/articles/7/comments")
+        .send(newComment)
+        .expect(201)
+        .then(({ body }) => {
+          const { comment } = body;
+          expect(comment).toEqual({
+            comment_id: 19,
+            article_id: 7,
+            author: newComment.username,
+            votes: 0,
+            created_at: comment.created_at,
+            body: newComment.body,
+          });
+        });
+    });
+    it("400: missing required fields/empty body given", () => {
+      return request(app)
+        .post("/api/articles/7/comments")
+        .send({})
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    it("400: invalid comment object sent", () => {
+      const newComment = {
+        username: "rogersop",
+        body: null,
+      };
+      return request(app)
+        .post("/api/articles/7/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    it("400: invalid article id given", () => {
+      const newComment = {
+        username: "lurker",
+        body: "This is the best article ever!!!",
+      };
+      return request(app)
+        .post("/api/articles/philippines/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    it("404: valid but non-existent article id given", () => {
+      const newComment = {
+        username: "lurker",
+        body: "This is the best article ever!!!",
+      };
+      return request(app)
+        .post("/api/articles/965/comments")
+        .send(newComment)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("No article found");
+        });
+    });
+    it("404: username given does not exist", () => {
+      const newComment = {
+        username: "cutetofuu",
+        body: "This is an article! :)",
+      };
+      return request(app)
+        .post("/api/articles/7/comments")
+        .send(newComment)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Username does not exist");
+        });
+    });
+  });
+
   describe("PATCH /api/articles/:article_id", () => {
     it("200: responds with an article object", () => {
       const newVotes = {
         inc_votes: 18,
       };
-
       return request(app)
         .patch("/api/articles/2")
         .send(newVotes)

@@ -3,6 +3,8 @@ const {
   fetchOneArticle,
   fetchArticleComments,
   selectArticleById,
+  addComment,
+  selectUsername,
   updateArticle,
 } = require("../models/articles.models");
 
@@ -43,15 +45,30 @@ exports.getArticleComments = (req, res, next) => {
     });
 };
 
-exports.patchArticle = (req, res, next) => {
-  const { inc_votes } = req.body;
+exports.postComment = (req, res, next) => {
   const { article_id } = req.params;
+  const newComment = req.body;
 
-  updateArticle(inc_votes, article_id)
-    .then((article) => {
-      res.status(200).send({ article });
+  selectArticleById(article_id)
+    .then(() => {
+      return selectUsername(newComment);
+    })
+    .then(() => {
+      return addComment(article_id, newComment);
+    })
+    .then((comment) => {
+      res.status(201).send({ comment });
     })
     .catch((err) => {
       next(err);
     });
+};
+
+exports.patchArticle = (req, res, next) => {
+  const { inc_votes } = req.body;
+  const { article_id } = req.params;
+
+  updateArticle(inc_votes, article_id).then((article) => {
+    res.status(200).send({ article });
+  });
 };
