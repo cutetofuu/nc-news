@@ -3,6 +3,7 @@ const {
   fetchOneArticle,
   fetchArticleComments,
   selectArticleById,
+  updateArticle,
 } = require("../models/articles.models");
 
 exports.getArticles = (req, res, next) => {
@@ -36,6 +37,19 @@ exports.getArticleComments = (req, res, next) => {
     .then((promisesResult) => {
       const comments = promisesResult[0];
       res.status(200).send({ comments });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.patchArticle = (req, res, next) => {
+  const { inc_votes } = req.body;
+  const { article_id } = req.params;
+
+  updateArticle(inc_votes, article_id)
+    .then((article) => {
+      res.status(200).send({ article });
     })
     .catch((err) => {
       next(err);

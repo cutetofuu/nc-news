@@ -220,4 +220,21 @@ describe("articles", () => {
         });
     });
   });
+
+  describe("PATCH /api/articles/:article_id", () => {
+    it("200: responds with an article object", () => {
+      const newVotes = {
+        inc_votes: 18,
+      };
+
+      return request(app)
+        .patch("/api/articles/2")
+        .send(newVotes)
+        .expect(200)
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article).toBeInstanceOf(Object);
+        });
+    });
+  });
 });
