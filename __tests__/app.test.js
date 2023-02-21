@@ -148,4 +148,41 @@ describe("articles", () => {
         });
     });
   });
+
+  describe("POST /api/articles/:article_id/comments", () => {
+    it("201: responds with a comment object", () => {
+      const newComment = {
+        username: "lurker",
+        body: "This is the best article ever!!!",
+      };
+      return request(app)
+        .post("/api/articles/7/comments")
+        .send(newComment)
+        .expect(201)
+        .then(({ body }) => {
+          const { comment } = body;
+          expect(comment).toBeInstanceOf(Object);
+        });
+    });
+    it("201: responds with a comment object with the correct keys", () => {
+      const newComment = {
+        username: "lurker",
+        body: "This is the best article ever!!!",
+      };
+      return request(app)
+        .post("/api/articles/7/comments")
+        .send(newComment)
+        .expect(201)
+        .then(({ body }) => {
+          const { comment } = body;
+          expect(comment).toMatchObject({
+            article_id: expect.any(Number),
+            author: expect.any(String),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            body: expect.any(String),
+          });
+        });
+    });
+  });
 });
