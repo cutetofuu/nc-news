@@ -83,3 +83,43 @@ exports.selectArticleById = (article_id) => {
     }
   });
 };
+
+exports.addComment = (article_id, newComment) => {
+  const { body, username } = newComment;
+
+  return db
+    .query(
+      `
+    INSERT INTO comments
+      (body, article_id, author)
+    VALUES
+      ($1, $2, $3)
+    RETURNING *
+    `,
+      [body, article_id, username]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    });
+};
+
+exports.selectUsername = (newComment) => {
+  const { username } = newComment;
+
+  let queryString = `SELECT * FROM users`;
+  const queryParams = [];
+
+  if (username !== undefined) {
+    queryString += ` WHERE username = $1`;
+    queryParams.push(username);
+  }
+
+  return db.query(queryString, queryParams).then((result) => {
+    const { rowCount } = result;
+    if (rowCount === 0) {
+      return Promise.reject({ status: 404, msg: "Username does not exist" });
+    } else {
+      return result.rows[0];
+    }
+  });
+};
