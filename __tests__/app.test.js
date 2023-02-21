@@ -256,5 +256,74 @@ describe("articles", () => {
           });
         });
     });
+    it("201: responds with the comment object that has been sent", () => {
+      const newComment = {
+        username: "lurker",
+        body: "This is the best article ever!!!",
+      };
+      return request(app)
+        .post("/api/articles/7/comments")
+        .send(newComment)
+        .expect(201)
+        .then(({ body }) => {
+          const { comment } = body;
+          expect(comment).toEqual({
+            comment_id: 19,
+            article_id: 7,
+            author: newComment.username,
+            votes: 0,
+            created_at: comment.created_at,
+            body: newComment.body,
+          });
+        });
+    });
+    it("400: missing required fields/empty body given", () => {
+      return request(app)
+        .post("/api/articles/7/comments")
+        .send({})
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    it("400: invalid comment object sent", () => {
+      const newComment = {
+        username: "cutetofuu",
+        body: 32558685037,
+      };
+      return request(app)
+        .post("/api/articles/7/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    it("400: invalid article id given", () => {
+      const newComment = {
+        username: "lurker",
+        body: "This is the best article ever!!!",
+      };
+      return request(app)
+        .post("/api/articles/philippines/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    it("404: valid but non-existent article id given", () => {
+      const newComment = {
+        username: "lurker",
+        body: "This is the best article ever!!!",
+      };
+      return request(app)
+        .post("/api/articles/965/comments")
+        .send(newComment)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("No article found");
+        });
+    });
   });
 });
