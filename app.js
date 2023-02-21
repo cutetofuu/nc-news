@@ -7,6 +7,8 @@ const {
   postComment,
   patchArticle,
 } = require("./controllers/articles.controller");
+const { getUsers } = require("./controllers/users.controller");
+
 const {
   handlePSQL400s,
   handleCustomErrors,
@@ -30,6 +32,8 @@ app.get("/api/articles/:article_id/comments", getArticleComments);
 app.post("/api/articles/:article_id/comments", postComment);
 
 app.patch("/api/articles/:article_id", patchArticle);
+
+app.get("/api/users", getUsers);
 
 app.use(handlePSQL400s);
 
