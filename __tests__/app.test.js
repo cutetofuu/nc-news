@@ -248,6 +248,7 @@ describe("articles", () => {
         .then(({ body }) => {
           const { comment } = body;
           expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
             article_id: expect.any(Number),
             author: expect.any(String),
             votes: expect.any(Number),
