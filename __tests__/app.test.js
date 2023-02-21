@@ -209,5 +209,15 @@ describe("articles", () => {
           expect(body.msg).toBe("No article found");
         });
     });
+    it("200: responds with an empty array when given a valid article id with no comments", () => {
+      return request(app)
+        .get("/api/articles/7/comments")
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+          expect(comments).toHaveLength(0);
+          expect(comments).toEqual([]);
+        });
+    });
   });
 });

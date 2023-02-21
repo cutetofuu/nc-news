@@ -2,6 +2,7 @@ const {
   fetchArticles,
   fetchOneArticle,
   fetchArticleComments,
+  selectArticleById,
 } = require("../models/articles.models");
 
 exports.getArticles = (req, res, next) => {
@@ -27,8 +28,13 @@ exports.getOneArticle = (req, res, next) => {
 
 exports.getArticleComments = (req, res, next) => {
   const { article_id } = req.params;
-  fetchArticleComments(article_id)
-    .then((comments) => {
+
+  const commentsPromise = fetchArticleComments(article_id);
+  const checkArticle = selectArticleById(article_id);
+
+  Promise.all([commentsPromise, checkArticle])
+    .then((promisesResult) => {
+      const comments = promisesResult[0];
       res.status(200).send({ comments });
     })
     .catch((err) => {
