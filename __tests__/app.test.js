@@ -353,4 +353,161 @@ describe("articles", () => {
         });
     });
   });
+
+  describe("PATCH /api/articles/:article_id", () => {
+    it("200: responds with an article object", () => {
+      const newVotes = {
+        inc_votes: 18,
+      };
+      return request(app)
+        .patch("/api/articles/2")
+        .send(newVotes)
+        .expect(200)
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article).toBeInstanceOf(Object);
+        });
+    });
+    it("200: responds with an article object with the correct keys", () => {
+      const newVotes = {
+        inc_votes: 18,
+      };
+      return request(app)
+        .patch("/api/articles/2")
+        .send(newVotes)
+        .expect(200)
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            topic: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+          });
+        });
+    });
+    it("200: responds with an article object with increased votes", () => {
+      const newVotes = {
+        inc_votes: 18,
+      };
+      return request(app)
+        .patch("/api/articles/6")
+        .send(newVotes)
+        .expect(200)
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article).toEqual({
+            article_id: 6,
+            title: "A",
+            topic: "mitch",
+            author: "icellusedkars",
+            body: "Delicious tin of cat food",
+            created_at: article.created_at,
+            votes: 18,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          });
+        });
+    });
+    it("200: responds with an article object with decreased votes", () => {
+      const newVotes = {
+        inc_votes: -38,
+      };
+      return request(app)
+        .patch("/api/articles/1")
+        .send(newVotes)
+        .expect(200)
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article).toEqual({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: article.created_at,
+            votes: 62,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          });
+        });
+    });
+    it("400: missing required fields/empty body given", () => {
+      return request(app)
+        .patch("/api/articles/3")
+        .send({})
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    it("400: invalid votes object sent", () => {
+      const newVotes = {
+        inc_votes: "northcoders",
+      };
+      return request(app)
+        .patch("/api/articles/8")
+        .send(newVotes)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    it("400: invalid article id given", () => {
+      const newVotes = {
+        inc_votes: -38,
+      };
+      return request(app)
+        .patch("/api/articles/pickle")
+        .send(newVotes)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    it("404: valid but non-existent article id given", () => {
+      const newVotes = {
+        inc_votes: 18,
+      };
+      return request(app)
+        .patch("/api/articles/860")
+        .send(newVotes)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("No article found");
+        });
+    });
+  });
+
+  describe("GET /api/users", () => {
+    it("200: responds with an array", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body }) => {
+          const { users } = body;
+          expect(users).toBeInstanceOf(Array);
+        });
+    });
+    it("200: responds with all the users with the correct keys", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body }) => {
+          const { users } = body;
+          expect(users).toHaveLength(4);
+          users.forEach((user) => {
+            expect(user).toMatchObject({
+              username: expect.any(String),
+              name: expect.any(String),
+              avatar_url: expect.any(String),
+            });
+          });
+        });
+    });
+  });
 });
