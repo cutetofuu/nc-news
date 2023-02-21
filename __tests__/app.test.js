@@ -101,6 +101,19 @@ describe("articles", () => {
           expect(articles).toEqual(sortedArticles);
         });
     });
+    it("200: filters articles by topic", () => {
+      return request(app)
+        .get("/api/articles?topic=cats")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          const copyArticles = [...articles];
+          const sortedArticles = copyArticles.filter((article) => {
+            return article.topic === "cats";
+          });
+          expect(articles).toEqual(sortedArticles);
+        });
+    });
   });
 
   describe("GET /api/articles/:article_id", () => {
