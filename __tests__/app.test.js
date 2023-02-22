@@ -500,7 +500,7 @@ describe("articles", () => {
 });
 
 describe("comments", () => {
-  describe.only("DELETE /api/comments/:comment_id", () => {
+  describe("DELETE /api/comments/:comment_id", () => {
     it("204: deletes a comment from the database", () => {
       return request(app).delete("/api/comments/6").expect(204);
     });
