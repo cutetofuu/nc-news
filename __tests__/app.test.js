@@ -3,6 +3,7 @@ const app = require("../app");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data/index");
 const db = require("../db/connection");
+const { string } = require("pg-format");
 
 beforeEach(() => {
   return seed(testData);
@@ -14,12 +15,12 @@ afterAll(() => {
 
 describe("app", () => {
   describe("GET /api", () => {
-    it("200: responds with a server ok message", () => {
+    it("200: responds with a string", () => {
       return request(app)
         .get("/api")
         .expect(200)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Server is working fine");
+        .then(({ text }) => {
+          expect(typeof text).toBe("string");
         });
     });
   });

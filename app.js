@@ -1,5 +1,5 @@
 const express = require("express");
-const { checkServer } = require("./controllers/api.controller");
+const { getEndpoints } = require("./controllers/api.controller");
 const { getTopics } = require("./controllers/topics.controller");
 const {
   getArticles,
@@ -20,7 +20,7 @@ const app = express();
 
 app.use(express.json());
 
-app.get("/api", checkServer);
+app.get("/api", getEndpoints);
 
 app.get("/api/topics", getTopics);
 
