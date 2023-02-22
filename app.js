@@ -8,7 +8,7 @@ const {
   patchArticle,
 } = require("./controllers/articles.controller");
 const { getUsers } = require("./controllers/users.controller");
-
+const { deleteComment } = require("./controllers/comments.controller");
 const {
   handlePSQL400s,
   handleCustomErrors,
@@ -34,6 +34,8 @@ app.post("/api/articles/:article_id/comments", postComment);
 app.patch("/api/articles/:article_id", patchArticle);
 
 app.get("/api/users", getUsers);
+
+app.delete("/api/comments/:comment_id", deleteComment);
 
 app.use(handlePSQL400s);
 
