@@ -111,10 +111,10 @@ describe("articles", () => {
         .then(({ body }) => {
           const { articles } = body;
           const copyArticles = [...articles];
-          const sortedArticles = copyArticles.filter((article) => {
+          const filteredArticles = copyArticles.filter((article) => {
             return article.topic === "cats";
           });
-          expect(sortedArticles).toEqual(articles);
+          expect(articles).toEqual(filteredArticles);
         });
     });
     it("200: responds with an empty array when given a valid topic with no articles", () => {
@@ -141,18 +141,7 @@ describe("articles", () => {
         .expect(200)
         .then(({ body }) => {
           const { articles } = body;
-          const copyArticles = [...articles];
-          const sortedArticles = copyArticles.sort((articleA, articleB) => {
-            const upperCaseArticleA = articleA.title.toUpperCase();
-            const upperCaseArticleB = articleB.title.toUpperCase();
-            if (upperCaseArticleB > upperCaseArticleA) {
-              return 1;
-            }
-            if (upperCaseArticleB < upperCaseArticleA) {
-              return -1;
-            }
-          });
-          expect(articles).toEqual(sortedArticles);
+          expect(articles).toBeSortedBy("title", { descending: true });
         });
     });
     it("200: sorts articles by article_id in descending order", () => {
@@ -161,11 +150,7 @@ describe("articles", () => {
         .expect(200)
         .then(({ body }) => {
           const { articles } = body;
-          const copyArticles = [...articles];
-          const sortedArticles = copyArticles.sort((articleA, articleB) => {
-            return articleB.article_id - articleA.article_id;
-          });
-          expect(articles).toEqual(sortedArticles);
+          expect(articles).toBeSortedBy("article_id", { descending: true });
         });
     });
     it("400: invalid sort_by query given", () => {
@@ -182,13 +167,7 @@ describe("articles", () => {
         .expect(200)
         .then(({ body }) => {
           const { articles } = body;
-          const copyArticles = [...articles];
-          const sortedArticles = copyArticles.sort((articleA, articleB) => {
-            return (
-              new Date(articleA.created_at) - new Date(articleB.created_at)
-            );
-          });
-          expect(articles).toEqual(sortedArticles);
+          expect(articles).toBeSortedBy("created_at", { ascending: true });
         });
     });
     it("400: invalid order query given", () => {
