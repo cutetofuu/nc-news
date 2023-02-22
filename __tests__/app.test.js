@@ -14,6 +14,16 @@ afterAll(() => {
 });
 
 describe("app", () => {
+  describe("server errors", () => {
+    it("404: valid but non-existent path given", () => {
+      return request(app)
+        .get("/non_existent_path")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Path not found");
+        });
+    });
+  });
   describe("GET /api", () => {
     it("200: responds with a string", () => {
       return request(app)

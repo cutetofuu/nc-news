@@ -1,3 +1,7 @@
+exports.handle404NonExistentPaths = (req, res, next) => {
+  res.status(404).send({ msg: "Path not found" });
+};
+
 exports.handlePSQL400s = (err, req, res, next) => {
   const psqlErrorCodes = ["22P02", "23502", "23503", "42601"];
   if (psqlErrorCodes.includes(err.code)) {

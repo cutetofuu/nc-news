@@ -11,6 +11,7 @@ const {
 const { getUsers } = require("./controllers/users.controller");
 const { deleteComment } = require("./controllers/comments.controller");
 const {
+  handle404NonExistentPaths,
   handlePSQL400s,
   handleCustomErrors,
   handle500Statuses,
@@ -37,6 +38,8 @@ app.patch("/api/articles/:article_id", patchArticle);
 app.get("/api/users", getUsers);
 
 app.delete("/api/comments/:comment_id", deleteComment);
+
+app.use(handle404NonExistentPaths);
 
 app.use(handlePSQL400s);
 
