@@ -6,11 +6,18 @@ const {
   addComment,
   selectUsername,
   updateArticle,
+  selectTopic,
 } = require("../models/articles.models");
 
 exports.getArticles = (req, res, next) => {
-  fetchArticles()
-    .then((articles) => {
+  const { topic, sort_by, order } = req.query;
+
+  const articlesPromise = fetchArticles(topic, sort_by, order);
+  const checkTopic = selectTopic(topic);
+
+  Promise.all([articlesPromise, checkTopic])
+    .then((promisesResult) => {
+      const articles = promisesResult[0];
       res.status(200).send({ articles });
     })
     .catch((err) => {
