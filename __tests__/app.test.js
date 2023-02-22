@@ -117,6 +117,14 @@ describe("articles", () => {
           expect(sortedArticles).toEqual(articles);
         });
     });
+    it("404: non-existent topic given", () => {
+      return request(app)
+        .get("/api/articles?topic=1000")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("No article found");
+        });
+    });
     it("200: sorts articles by title in descending order", () => {
       return request(app)
         .get("/api/articles?sort_by=title")
@@ -152,10 +160,33 @@ describe("articles", () => {
     });
     it("400: invalid sort_by query given", () => {
       return request(app)
-        .get("/api/articles?sort_by=potato")
+        .get("/api/articles?sort_by=invalid_sort_by")
         .expect(400)
         .then(({ body }) => {
           expect(body.msg).toBe("Invalid sort by option given");
+        });
+    });
+    it("200: orders articles in ascending order", () => {
+      return request(app)
+        .get("/api/articles?order=asc")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          const copyArticles = [...articles];
+          const sortedArticles = copyArticles.sort((articleA, articleB) => {
+            return (
+              new Date(articleA.created_at) - new Date(articleB.created_at)
+            );
+          });
+          expect(articles).toEqual(sortedArticles);
+        });
+    });
+    it("400: invalid order query given", () => {
+      return request(app)
+        .get("/api/articles?order=invalid_order")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
         });
     });
   });
