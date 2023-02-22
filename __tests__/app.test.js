@@ -128,6 +128,27 @@ describe("articles", () => {
             created_at: expect.any(String),
             votes: expect.any(Number),
             article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          });
+        });
+    });
+    it("200: responds with an article with the correct specific values", () => {
+      return request(app)
+        .get("/api/articles/1")
+        .expect(200)
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article).toEqual({
+            author: "butter_bridge",
+            title: "Living in the shadow of a great man",
+            article_id: 1,
+            body: "I find this existence challenging",
+            topic: "mitch",
+            created_at: article.created_at,
+            votes: 100,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            comment_count: 11,
           });
         });
     });
