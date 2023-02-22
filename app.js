@@ -1,5 +1,6 @@
 const express = require("express");
-const { checkServer, getTopics } = require("./controllers/topics.controller");
+const { checkServer } = require("./controllers/api.controller");
+const { getTopics } = require("./controllers/topics.controller");
 const {
   getArticles,
   getOneArticle,
