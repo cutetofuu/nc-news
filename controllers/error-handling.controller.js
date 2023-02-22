@@ -1,5 +1,5 @@
 exports.handlePSQL400s = (err, req, res, next) => {
-  const psqlErrorCodes = ["22P02", "23502", "23503"];
+  const psqlErrorCodes = ["22P02", "23502", "23503", "42601"];
   if (psqlErrorCodes.includes(err.code)) {
     res.status(400).send({ msg: "Bad Request" });
   } else {
