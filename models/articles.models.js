@@ -1,27 +1,49 @@
 const db = require("../db/connection");
 
-exports.fetchArticles = () => {
-  return db
-    .query(
-      `
-          SELECT 
-              articles.author,
-              articles.title,
-              articles.article_id,
-              articles.topic,
-              articles.created_at,
-              articles.votes,
-              articles.article_img_url,
-              COUNT(comments.article_id)::INTEGER AS comment_count
-          FROM articles
-          LEFT JOIN comments ON articles.article_id = comments.article_id
-          GROUP BY articles.article_id
-          ORDER BY articles.created_at DESC
-      `
-    )
-    .then(({ rows }) => {
-      return rows;
-    });
+exports.fetchArticles = (topic, sort_by) => {
+  const validSortByOptions = [
+    "article_id",
+    "title",
+    "topic",
+    "author",
+    "created_at",
+    "votes",
+  ];
+
+  if (sort_by && !validSortByOptions.includes(sort_by)) {
+    return Promise.reject({ status: 400, msg: "Invalid sort by option given" });
+  }
+
+  let queryString = `
+    SELECT 
+      articles.author,
+      articles.title,
+      articles.article_id,
+      articles.topic,
+      articles.created_at,
+      articles.votes,
+      articles.article_img_url,
+      COUNT(comments.article_id)::INTEGER AS comment_count
+    FROM articles
+    LEFT JOIN comments ON articles.article_id = comments.article_id`;
+  const queryParams = [];
+
+  if (topic) {
+    queryString += ` WHERE articles.topic = $1`;
+    queryParams.push(topic);
+  }
+
+  queryString += ` GROUP BY articles.article_id`;
+
+  if (sort_by) {
+    queryString += ` ORDER BY articles.${sort_by} DESC`;
+  } else {
+    queryString += ` ORDER BY articles.created_at DESC`;
+  }
+
+  return db.query(queryString, queryParams).then(({ rows }) => {
+    return rows;
+  });
 };
 
 exports.fetchOneArticle = (article_id) => {

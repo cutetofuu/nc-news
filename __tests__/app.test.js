@@ -86,7 +86,7 @@ describe("articles", () => {
           });
         });
     });
-    it("200: sorts articles by date in descending order", () => {
+    it("200: by default, sorts articles by date in descending order", () => {
       return request(app)
         .get("/api/articles")
         .expect(200)
@@ -101,6 +101,9 @@ describe("articles", () => {
           expect(articles).toEqual(sortedArticles);
         });
     });
+  });
+
+  describe("GET /api/articles (queries)", () => {
     it("200: filters articles by topic", () => {
       return request(app)
         .get("/api/articles?topic=cats")
@@ -111,7 +114,48 @@ describe("articles", () => {
           const sortedArticles = copyArticles.filter((article) => {
             return article.topic === "cats";
           });
+          expect(sortedArticles).toEqual(articles);
+        });
+    });
+    it("200: sorts articles by title in descending order", () => {
+      return request(app)
+        .get("/api/articles?sort_by=title")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          const copyArticles = [...articles];
+          const sortedArticles = copyArticles.sort((articleA, articleB) => {
+            const upperCaseArticleA = articleA.title.toUpperCase();
+            const upperCaseArticleB = articleB.title.toUpperCase();
+            if (upperCaseArticleB > upperCaseArticleA) {
+              return 1;
+            }
+            if (upperCaseArticleB < upperCaseArticleA) {
+              return -1;
+            }
+          });
           expect(articles).toEqual(sortedArticles);
+        });
+    });
+    it("200: sorts articles by article_id in descending order", () => {
+      return request(app)
+        .get("/api/articles?sort_by=article_id")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          const copyArticles = [...articles];
+          const sortedArticles = copyArticles.sort((articleA, articleB) => {
+            return articleB.article_id - articleA.article_id;
+          });
+          expect(articles).toEqual(sortedArticles);
+        });
+    });
+    it("400: invalid sort_by query given", () => {
+      return request(app)
+        .get("/api/articles?sort_by=potato")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid sort by option given");
         });
     });
   });
