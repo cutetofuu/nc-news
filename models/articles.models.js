@@ -53,11 +53,7 @@ exports.fetchArticles = (topic, sort_by, order) => {
   }
 
   return db.query(queryString, queryParams).then(({ rows }) => {
-    if (rows.length === 0) {
-      return Promise.reject({ status: 404, msg: "No article found" });
-    } else {
-      return rows;
-    }
+    return rows;
   });
 };
 
@@ -179,4 +175,23 @@ exports.updateArticle = (inc_votes, article_id) => {
         return rows[0];
       }
     });
+};
+
+exports.selectTopic = (topic) => {
+  let queryString = `SELECT * FROM topics`;
+  const queryParams = [];
+
+  if (topic !== undefined) {
+    queryString += ` WHERE topics.slug = $1`;
+    queryParams.push(topic);
+  }
+
+  return db.query(queryString, queryParams).then((result) => {
+    const { rowCount } = result;
+    if (rowCount === 0) {
+      return Promise.reject({ status: 404, msg: "Topic not found" });
+    } else {
+      return rowCount[0];
+    }
+  });
 };

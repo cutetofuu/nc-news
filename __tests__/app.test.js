@@ -117,12 +117,22 @@ describe("articles", () => {
           expect(sortedArticles).toEqual(articles);
         });
     });
+    it("200: responds with an empty array when given a valid topic with no articles", () => {
+      return request(app)
+        .get("/api/articles?topic=paper")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles).toHaveLength(0);
+          expect(articles).toEqual([]);
+        });
+    });
     it("404: non-existent topic given", () => {
       return request(app)
         .get("/api/articles?topic=1000")
         .expect(404)
         .then(({ body }) => {
-          expect(body.msg).toBe("No article found");
+          expect(body.msg).toBe("Topic not found");
         });
     });
     it("200: sorts articles by title in descending order", () => {
