@@ -498,3 +498,27 @@ describe("articles", () => {
     });
   });
 });
+
+describe("comments", () => {
+  describe.only("DELETE /api/comments/:comment_id", () => {
+    it("204: deletes a comment from the database", () => {
+      return request(app).delete("/api/comments/6").expect(204);
+    });
+    it("400: invalid comment_id given", () => {
+      return request(app)
+        .delete("/api/comments/invalid_comment_id")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    it("404: valid but non-existent comment_id given", () => {
+      return request(app)
+        .delete("/api/comments/700")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Comment not found");
+        });
+    });
+  });
+});
