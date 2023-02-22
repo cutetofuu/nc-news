@@ -186,7 +186,7 @@ describe("articles", () => {
         .get("/api/articles?order=invalid_order")
         .expect(400)
         .then(({ body }) => {
-          expect(body.msg).toBe("Bad Request");
+          expect(body.msg).toBe("Invalid order option given");
         });
     });
   });

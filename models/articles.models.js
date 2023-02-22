@@ -9,9 +9,14 @@ exports.fetchArticles = (topic, sort_by, order) => {
     "created_at",
     "votes",
   ];
+  const validOrderOptions = ["asc", "desc"];
 
   if (sort_by && !validSortByOptions.includes(sort_by)) {
     return Promise.reject({ status: 400, msg: "Invalid sort by option given" });
+  }
+
+  if (order && !validOrderOptions.includes(order)) {
+    return Promise.reject({ status: 400, msg: "Invalid order option given" });
   }
 
   let queryString = `
