@@ -1,6 +1,6 @@
 const db = require("../db/connection");
 
-exports.fetchArticles = (topic, sort_by) => {
+exports.fetchArticles = (topic, sort_by, order) => {
   const validSortByOptions = [
     "article_id",
     "title",
@@ -36,13 +36,23 @@ exports.fetchArticles = (topic, sort_by) => {
   queryString += ` GROUP BY articles.article_id`;
 
   if (sort_by) {
-    queryString += ` ORDER BY articles.${sort_by} DESC`;
+    queryString += ` ORDER BY articles.${sort_by}`;
   } else {
-    queryString += ` ORDER BY articles.created_at DESC`;
+    queryString += ` ORDER BY articles.created_at`;
+  }
+
+  if (order) {
+    queryString += ` ${order}`;
+  } else {
+    queryString += ` DESC`;
   }
 
   return db.query(queryString, queryParams).then(({ rows }) => {
-    return rows;
+    if (rows.length === 0) {
+      return Promise.reject({ status: 404, msg: "No article found" });
+    } else {
+      return rows;
+    }
   });
 };
 
