@@ -8,6 +8,7 @@ exports.fetchArticles = (topic, sort_by, order) => {
     "author",
     "created_at",
     "votes",
+    "article_img_url",
   ];
   const validOrderOptions = ["asc", "desc"];
 
