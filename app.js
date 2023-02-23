@@ -10,6 +10,9 @@ const {
 } = require("./controllers/articles.controller");
 const { getUsers } = require("./controllers/users.controller");
 const { deleteComment } = require("./controllers/comments.controller");
+
+const apiRouter = require("./routes/api.router");
+
 const {
   handle404NonExistentPaths,
   handlePSQL400s,
@@ -21,9 +24,9 @@ const app = express();
 
 app.use(express.json());
 
-app.get("/api", getEndpoints);
+app.use("/api", apiRouter);
 
-app.get("/api/topics", getTopics);
+// app.get("/api/topics", getTopics);
 
 app.get("/api/articles", getArticles);
 
