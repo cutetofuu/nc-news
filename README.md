@@ -44,7 +44,7 @@ This is an API that simulates the backend service used on a news/article website
 
    - `npm run setup-dbs` - creates the development and test databases
    - `npm run seed` - seeds the database
-   - `npm run dev` - allow for your local server to listen out for requests
+   - `npm run dev` - allows for your local server to listen out for requests
 
 7. Make requests by using an API client, such as [Insomnia](https://insomnia.rest/download), or you can open up your browser and type in `localhost:9090/[insert path here]`. The available endpoints can be found in `endpoints.json` or [here](https://nc-news-2yza.onrender.com/api).
 
