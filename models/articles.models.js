@@ -208,3 +208,22 @@ exports.selectTopic = (topic) => {
     }
   });
 };
+
+exports.addArticle = (newArticle) => {
+  const { author, title, body, topic, article_img_url } = newArticle;
+
+  return db
+    .query(
+      `
+    INSERT INTO articles
+      (author, title, body, topic, article_img_url)
+    VALUES
+      ($1, $2, $3, $4, $5)
+    RETURNING *
+  `,
+      [author, title, body, topic, article_img_url]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    });
+};
