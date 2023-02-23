@@ -26,6 +26,7 @@ This is an API that simulates the backend service used on a news/article website
 
 4. `users`
    - shows a collection of users
+   - shows a specific user, when a username is given
 
 ## Instructions
 
