@@ -39,13 +39,13 @@ This is an API that simulates the backend service used on a news/article website
 
 5. Install dependencies by running `npm install` in your terminal.
 
-6. Setup the local development and test databases by running the following scripts:
+6. Setup the development and test databases by running the following scripts:
 
    - `npm run setup-dbs` - creates the development and test databases
    - `npm run seed` - seeds the database
-   - `npm run dev` - runs the database
+   - `npm run dev` - allow for your local server to listen out for requests
 
-7. Make requests by using an API client, such as [Insomnia](https://insomnia.rest/download) or open up your browser and type in `localhost:9090/[insert path here]`. The available endpoints can be found in `endpoints.json` or [here](https://nc-news-2yza.onrender.com/api).
+7. Make requests by using an API client, such as [Insomnia](https://insomnia.rest/download), or you can open up your browser and type in `localhost:9090/[insert path here]`. The available endpoints can be found in `endpoints.json` or [here](https://nc-news-2yza.onrender.com/api).
 
 8. Run `npm test` to run all tests.
 
