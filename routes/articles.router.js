@@ -5,9 +5,10 @@ const {
   patchArticle,
   getArticleComments,
   postComment,
+  postArticle,
 } = require("../controllers/articles.controller");
 
-articlesRouter.route("/").get(getArticles);
+articlesRouter.route("/").get(getArticles).post(postArticle);
 
 articlesRouter.route("/:article_id").get(getOneArticle).patch(patchArticle);
 
