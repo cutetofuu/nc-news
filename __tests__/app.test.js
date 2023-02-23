@@ -48,6 +48,7 @@ describe("app", () => {
             "POST /api/articles/:article_id/comments": expect.any(Object),
             "PATCH /api/articles/:article_id": expect.any(Object),
             "GET /api/users": expect.any(Object),
+            "GET /api/users/:username": expect.any(Object),
             "DELETE /api/comments/:comment_id": expect.any(Object),
           });
         });
@@ -597,7 +598,9 @@ describe("articles", () => {
         });
     });
   });
+});
 
+describe("users", () => {
   describe("GET /api/users", () => {
     it("200: responds with an array", () => {
       return request(app)
@@ -622,6 +625,38 @@ describe("articles", () => {
               avatar_url: expect.any(String),
             });
           });
+        });
+    });
+  });
+  describe("GET /api/users/:username", () => {
+    it("200: responds with an object", () => {
+      return request(app)
+        .get("/api/users/icellusedkars")
+        .expect(200)
+        .then(({ body }) => {
+          const { user } = body;
+          expect(user).toBeInstanceOf(Object);
+        });
+    });
+    it("200: responds with a user object with the correct keys", () => {
+      return request(app)
+        .get("/api/users/icellusedkars")
+        .expect(200)
+        .then(({ body }) => {
+          const { user } = body;
+          expect(user).toMatchObject({
+            username: expect.any(String),
+            avatar_url: expect.any(String),
+            name: expect.any(String),
+          });
+        });
+    });
+    it("404: non-existent user given", () => {
+      return request(app)
+        .get("/api/users/invalid_user15")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Username does not exist");
         });
     });
   });
