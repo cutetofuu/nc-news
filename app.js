@@ -1,5 +1,6 @@
 const express = require("express");
-const { checkServer, getTopics } = require("./controllers/topics.controller");
+const { getEndpoints } = require("./controllers/api.controller");
+const { getTopics } = require("./controllers/topics.controller");
 const {
   getArticles,
   getOneArticle,
@@ -10,6 +11,7 @@ const {
 const { getUsers } = require("./controllers/users.controller");
 const { deleteComment } = require("./controllers/comments.controller");
 const {
+  handle404NonExistentPaths,
   handlePSQL400s,
   handleCustomErrors,
   handle500Statuses,
@@ -19,7 +21,7 @@ const app = express();
 
 app.use(express.json());
 
-app.get("/api", checkServer);
+app.get("/api", getEndpoints);
 
 app.get("/api/topics", getTopics);
 
@@ -36,6 +38,8 @@ app.patch("/api/articles/:article_id", patchArticle);
 app.get("/api/users", getUsers);
 
 app.delete("/api/comments/:comment_id", deleteComment);
+
+app.use(handle404NonExistentPaths);
 
 app.use(handlePSQL400s);
 

@@ -13,13 +13,43 @@ afterAll(() => {
 });
 
 describe("app", () => {
+  describe("server errors", () => {
+    it("404: valid but non-existent path given", () => {
+      return request(app)
+        .get("/non_existent_path")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Path not found");
+        });
+    });
+  });
   describe("GET /api", () => {
-    it("200: responds with a server ok message", () => {
+    it("200: responds with an object", () => {
       return request(app)
         .get("/api")
         .expect(200)
         .then(({ body }) => {
-          expect(body.msg).toBe("Server is working fine");
+          const { parsedFile } = body;
+          expect(typeof parsedFile).toBe("object");
+        });
+    });
+    it("200: responds with all the available API endpoints", () => {
+      return request(app)
+        .get("/api")
+        .expect(200)
+        .then(({ body }) => {
+          const { parsedFile } = body;
+          expect(parsedFile).toMatchObject({
+            "GET /api": expect.any(Object),
+            "GET /api/topics": expect.any(Object),
+            "GET /api/articles": expect.any(Object),
+            "GET /api/articles/:article_id": expect.any(Object),
+            "GET /api/articles/:article_id/comments": expect.any(Object),
+            "POST /api/articles/:article_id/comments": expect.any(Object),
+            "PATCH /api/articles/:article_id": expect.any(Object),
+            "GET /api/users": expect.any(Object),
+            "DELETE /api/comments/:comment_id": expect.any(Object),
+          });
         });
     });
   });
