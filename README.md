@@ -13,6 +13,7 @@ This is an API that simulates the backend service used on a news/article website
    - shows a collection of articles
    - shows a specific article, when an article id is given
    - updates the vote count for a specific article
+   - posts a new article
 
 2. `topics`
 
@@ -23,6 +24,7 @@ This is an API that simulates the backend service used on a news/article website
    - shows a collection of comments for a specific article
    - posts a new comment to a specific article
    - deletes an existing comment
+   - updates the vote count for a specific comment
 
 4. `users`
    - shows a collection of users

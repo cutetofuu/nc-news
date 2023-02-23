@@ -78,6 +78,29 @@
       }
     }
   },
+  "POST /api/articles": {
+    "description": "posts a new article, and responds with the new article",
+    "exampleRequestBody": {
+      "author": "happyamy2016",
+      "title": "Kate loves her cat Pickle",
+      "body": "Kitty ipsum dolor sit amet, shed everywhere shed everywhere stretching attack your ankles chase the red dot, hairball run catnip eat the grass sniff.",
+      "topic": "coding",
+      "article_img_url": "https://www.pexels.com/photo/brown-and-black-cat-37337/"
+    },
+    "exampleResponse": {
+      "article": {
+        "author": "happyamy2016",
+        "title": "Kate loves her cat Pickle",
+        "article_id": 39,
+        "body": "Kitty ipsum dolor sit amet, shed everywhere shed everywhere stretching attack your ankles chase the red dot, hairball run catnip eat the grass sniff.",
+        "topic": "coding",
+        "created_at": "2023-02-23T20:55:05.548Z",
+        "votes": 0,
+        "article_img_url": "https://www.pexels.com/photo/brown-and-black-cat-37337/",
+        "comment_count": 0
+      }
+    }
+  },
   "PATCH /api/articles/:article_id": {
     "description": "updates the votes of a given article_id, and responds with the updated article",
     "parameters": ["article_id"],
@@ -122,5 +145,20 @@
   "DELETE /api/comments/:comment_id": {
     "description": "deletes a given comment by comment_id",
     "parameters": ["comment_id"]
+  },
+  "PATCH /api/comments/:comment_id": {
+    "description": "updates the votes of a given comment_id, and responds with the updated comment",
+    "parameters": ["comment_id"],
+    "exampleRequestBody": { "inc_votes": 18 },
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 2,
+        "body": "Nobis consequatur animi. Ullam nobis quaerat voluptates veniam.",
+        "article_id": 4,
+        "author": "grumpy19",
+        "votes": 25,
+        "created_at": "2020-01-01T15:02:00.000Z"
+      }
+    }
   }
 }
