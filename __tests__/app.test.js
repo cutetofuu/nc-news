@@ -629,7 +629,7 @@ describe("users", () => {
     });
   });
   describe("GET /api/users/:username", () => {
-    it("200: responds with an object", () => {
+    it("200: responds with a user object", () => {
       return request(app)
         .get("/api/users/icellusedkars")
         .expect(200)
@@ -651,9 +651,9 @@ describe("users", () => {
           });
         });
     });
-    it("404: non-existent user given", () => {
+    it("404: non-existent username given", () => {
       return request(app)
-        .get("/api/users/invalid_user15")
+        .get("/api/users/invalid_username15")
         .expect(404)
         .then(({ body }) => {
           expect(body.msg).toBe("Username does not exist");
@@ -678,6 +678,127 @@ describe("comments", () => {
     it("404: valid but non-existent comment_id given", () => {
       return request(app)
         .delete("/api/comments/700")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Comment not found");
+        });
+    });
+  });
+
+  describe("PATCH /api/comments/:comment_id", () => {
+    it("200: responds with a comment object", () => {
+      const newVotes = {
+        inc_votes: 27,
+      };
+      return request(app)
+        .patch("/api/comments/9")
+        .send(newVotes)
+        .expect(200)
+        .then(({ body }) => {
+          const { comment } = body;
+          expect(comment).toBeInstanceOf(Object);
+        });
+    });
+    it("200: responds with a comment object with the correct keys", () => {
+      const newVotes = {
+        inc_votes: 27,
+      };
+      return request(app)
+        .patch("/api/comments/9")
+        .send(newVotes)
+        .expect(200)
+        .then(({ body }) => {
+          const { comment } = body;
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: expect.any(Number),
+          });
+        });
+    });
+    it("200: responds with a comment object with increased votes", () => {
+      const newVotes = {
+        inc_votes: 27,
+      };
+      return request(app)
+        .patch("/api/comments/9")
+        .send(newVotes)
+        .expect(200)
+        .then(({ body }) => {
+          const { comment } = body;
+          expect(comment).toEqual({
+            comment_id: 9,
+            body: "Superficially charming",
+            article_id: 1,
+            author: "icellusedkars",
+            votes: 27,
+            created_at: comment.created_at,
+          });
+        });
+    });
+    it("200: responds with a comment object with decreased votes", () => {
+      const newVotes = {
+        inc_votes: -15,
+      };
+      return request(app)
+        .patch("/api/comments/7")
+        .send(newVotes)
+        .expect(200)
+        .then(({ body }) => {
+          const { comment } = body;
+          expect(comment).toEqual({
+            comment_id: 7,
+            body: "Lobster pot",
+            article_id: 1,
+            author: "icellusedkars",
+            votes: -15,
+            created_at: comment.created_at,
+          });
+        });
+    });
+    it("400: missing required fields/empty body given", () => {
+      return request(app)
+        .patch("/api/comments/4")
+        .send({})
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    it("400: invalid votes object sent", () => {
+      const newVotes = {
+        inc_votes: "invalid_votes",
+      };
+      return request(app)
+        .patch("/api/comments/7")
+        .send(newVotes)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    it("400: invalid comment id given", () => {
+      const newVotes = {
+        inc_votes: 46,
+      };
+      return request(app)
+        .patch("/api/comments/invalid_id")
+        .send(newVotes)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    it("404: valid but non-existent comment id given", () => {
+      const newVotes = {
+        inc_votes: 10,
+      };
+      return request(app)
+        .patch("/api/comments/1000")
+        .send(newVotes)
         .expect(404)
         .then(({ body }) => {
           expect(body.msg).toBe("Comment not found");
