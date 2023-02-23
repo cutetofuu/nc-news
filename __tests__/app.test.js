@@ -3,7 +3,6 @@ const app = require("../app");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data/index");
 const db = require("../db/connection");
-const { string } = require("pg-format");
 
 beforeEach(() => {
   return seed(testData);
@@ -25,12 +24,32 @@ describe("app", () => {
     });
   });
   describe("GET /api", () => {
-    it("200: responds with a string", () => {
+    it("200: responds with an object", () => {
       return request(app)
         .get("/api")
         .expect(200)
-        .then(({ text }) => {
-          expect(typeof text).toBe("string");
+        .then(({ body }) => {
+          const { parsedFile } = body;
+          expect(typeof parsedFile).toBe("object");
+        });
+    });
+    it("200: responds with all the available API endpoints", () => {
+      return request(app)
+        .get("/api")
+        .expect(200)
+        .then(({ body }) => {
+          const { parsedFile } = body;
+          expect(parsedFile).toMatchObject({
+            "GET /api": expect.any(Object),
+            "GET /api/topics": expect.any(Object),
+            "GET /api/articles": expect.any(Object),
+            "GET /api/articles/:article_id": expect.any(Object),
+            "GET /api/articles/:article_id/comments": expect.any(Object),
+            "POST /api/articles/:article_id/comments": expect.any(Object),
+            "PATCH /api/articles/:article_id": expect.any(Object),
+            "GET /api/users": expect.any(Object),
+            "DELETE /api/comments/:comment_id": expect.any(Object),
+          });
         });
     });
   });
