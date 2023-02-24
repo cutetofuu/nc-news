@@ -543,6 +543,33 @@ describe("articles", () => {
           }
         });
     });
+    it("200: responds with the correct comments when given limit and page queries", () => {
+      return request(app)
+        .get("/api/articles/1/comments?limit=5&p=2")
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+          const copyCommentData = [...testData.commentData];
+          const sortedComments = copyCommentData.sort((commentA, commentB) => {
+            return (
+              new Date(commentB.created_at) - new Date(commentA.created_at)
+            );
+          });
+          const filteredComments = sortedComments.filter((comment) => {
+            return comment.article_id === 1;
+          });
+          const pageTwoComments = filteredComments.slice(5, 10);
+
+          for (let i = 0; i < comments.length; i++) {
+            expect(comments[i].article_id).toEqual(
+              pageTwoComments[i].article_id
+            );
+            expect(comments[i].votes).toEqual(pageTwoComments[i].votes);
+            expect(comments[i].author).toEqual(pageTwoComments[i].author);
+            expect(comments[i].body).toEqual(pageTwoComments[i].body);
+          }
+        });
+    });
     it("200: responds with an empty array when page number given > number of available comments", () => {
       return request(app)
         .get("/api/articles/1/comments?p=5")
