@@ -548,6 +548,33 @@ describe("articles", () => {
           });
         });
     });
+    it("201: article_img_url will default if not provided", () => {
+      const newArticle = {
+        author: "butter_bridge",
+        title: "Kate loves her cat Pickle",
+        body: "Kitty ipsum dolor sit amet, shed everywhere shed everywhere stretching attack your ankles chase the red dot, hairball run catnip eat the grass sniff.",
+        topic: "cats",
+      };
+      return request(app)
+        .post("/api/articles")
+        .send(newArticle)
+        .expect(201)
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article).toEqual({
+            author: "butter_bridge",
+            title: "Kate loves her cat Pickle",
+            body: "Kitty ipsum dolor sit amet, shed everywhere shed everywhere stretching attack your ankles chase the red dot, hairball run catnip eat the grass sniff.",
+            topic: "cats",
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            article_id: 13,
+            votes: 0,
+            created_at: article.created_at,
+            comment_count: 0,
+          });
+        });
+    });
     it("400: missing required fields/empty body given", () => {
       return request(app)
         .post("/api/articles")
