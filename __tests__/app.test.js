@@ -219,6 +219,9 @@ describe("articles", () => {
           expect(body.msg).toBe("Invalid order option given");
         });
     });
+  });
+
+  describe("GET /api/articles (pagination)", () => {
     it("200: limits the number of articles returned", () => {
       return request(app)
         .get("/api/articles?limit=5")
@@ -228,13 +231,12 @@ describe("articles", () => {
           expect(articles).toHaveLength(5);
         });
     });
-    it("200: by default, responds with a specified number of the most recent articles", () => {
+    it("200: responds with the most recent articles when only given a limit", () => {
       return request(app)
         .get("/api/articles?limit=5")
         .expect(200)
         .then(({ body }) => {
           const { articles } = body;
-          console.log(articles);
           const copyArticleData = [...testData.articleData];
           const sortedArticles = copyArticleData.sort((articleA, articleB) => {
             return (
@@ -256,13 +258,44 @@ describe("articles", () => {
           expect(body.msg).toBe("Invalid limit option given");
         });
     });
-    it("200: responds with the correct starting page", () => {
+    it("200: responds with the correct articles when only given a page", () => {
+      return request(app)
+        .get("/api/articles?p=2")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          const copyArticleData = [...testData.articleData];
+          const sortedArticles = copyArticleData.sort((articleA, articleB) => {
+            return (
+              new Date(articleB.created_at) - new Date(articleA.created_at)
+            );
+          });
+          const pageTwoArticles = sortedArticles.slice(11);
+          for (let i = 0; i < articles.length; i++) {
+            expect(articles[i].title).toEqual(pageTwoArticles[i].title);
+            expect(articles[i].author).toEqual(pageTwoArticles[i].author);
+            expect(articles[i].topic).toEqual(pageTwoArticles[i].topic);
+          }
+        });
+    });
+    it("200: responds with the correct articles when given limit and page queries", () => {
       return request(app)
         .get("/api/articles?limit=5&p=2")
         .expect(200)
         .then(({ body }) => {
           const { articles } = body;
-          expect(articles).toHaveLength(5);
+          const copyArticleData = [...testData.articleData];
+          const sortedArticles = copyArticleData.sort((articleA, articleB) => {
+            return (
+              new Date(articleB.created_at) - new Date(articleA.created_at)
+            );
+          });
+          const pageTwoArticles = sortedArticles.slice(6, 11);
+          for (let i = 0; i < articles.length; i++) {
+            expect(articles[i].title).toEqual(pageTwoArticles[i].title);
+            expect(articles[i].author).toEqual(pageTwoArticles[i].author);
+            expect(articles[i].topic).toEqual(pageTwoArticles[i].topic);
+          }
         });
     });
   });
