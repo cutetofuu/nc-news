@@ -362,6 +362,30 @@ describe("articles", () => {
           expect(comments).toHaveLength(5);
         });
     });
+    it("200: responds with the most recent comments when only given a limit", () => {
+      return request(app)
+        .get("/api/articles/1/comments?limit=5")
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+          const copyCommentData = [...testData.commentData];
+          const sortedComments = copyCommentData.sort((commentA, commentB) => {
+            return (
+              new Date(commentB.created_at) - new Date(commentA.created_at)
+            );
+          });
+          const filteredComments = sortedComments.filter((comment) => {
+            return comment.article_id === 1;
+          });
+
+          for (let i = 0; i < comments.length; i++) {
+            expect(comments[i].article_id).toBe(filteredComments[i].article_id);
+            expect(comments[i].votes).toBe(filteredComments[i].votes);
+            expect(comments[i].author).toBe(filteredComments[i].author);
+            expect(comments[i].body).toBe(filteredComments[i].body);
+          }
+        });
+    });
     it("200: responds with all the comments, when limit number given > number of available comments", () => {
       return request(app)
         .get("/api/articles/1/comments?limit=20")
@@ -379,33 +403,50 @@ describe("articles", () => {
           expect(body.msg).toBe("Invalid limit option given");
         });
     });
-    // it.only("200: responds with the correct articles when only given a page", () => {
-    //   return request(app)
-    //     .get("/api/articles/1/comments?p=2")
-    //     .expect(200)
-    //     .then(({ body }) => {
-    //       const { comments } = body;
-    //       const copyCommentData = [...testData.commentData];
-    //       const sortedComments = copyCommentData.sort((commentA, commentB) => {
-    //         return (
-    //           new Date(commentB.created_at) - new Date(commentA.created_at)
-    //         );
-    //       });
-    //       const filteredComments = sortedComments.filter((comment) => {
-    //         return comment.article_id === 1;
-    //       });
-    //       const pageTwoComments = filteredComments.slice(10, 20);
+    it("200: responds with the correct articles when only given a page", () => {
+      return request(app)
+        .get("/api/articles/1/comments?p=2")
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+          const copyCommentData = [...testData.commentData];
+          const sortedComments = copyCommentData.sort((commentA, commentB) => {
+            return (
+              new Date(commentB.created_at) - new Date(commentA.created_at)
+            );
+          });
+          const filteredComments = sortedComments.filter((comment) => {
+            return comment.article_id === 1;
+          });
+          const pageTwoComments = filteredComments.slice(10, 20);
 
-    //       for (let i = 0; i < comments.length; i++) {
-    //         expect(comments[i].votes).toEqual(pageTwoComments[i].votes);
-    //         expect(comments[i].author).toEqual(pageTwoComments[i].author);
-    //         expect(comments[i].body).toEqual(pageTwoComments[i].body);
-    //         expect(comments[i].article_id).toEqual(
-    //           pageTwoComments[i].article_id
-    //         );
-    //       }
-    //     });
-    // });
+          for (let i = 0; i < comments.length; i++) {
+            expect(comments[i].article_id).toEqual(
+              pageTwoComments[i].article_id
+            );
+            expect(comments[i].votes).toEqual(pageTwoComments[i].votes);
+            expect(comments[i].author).toEqual(pageTwoComments[i].author);
+            expect(comments[i].body).toEqual(pageTwoComments[i].body);
+          }
+        });
+    });
+    it("200: responds with an empty array when page number given > number of available comments", () => {
+      return request(app)
+        .get("/api/articles/1/comments?p=5")
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+          expect(comments).toEqual([]);
+        });
+    });
+    it("400: invalid page query given", () => {
+      return request(app)
+        .get("/api/articles/1/comments?p=invalid_query")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid page option given");
+        });
+    });
   });
 
   describe("POST /api/articles/:article_id/comments", () => {

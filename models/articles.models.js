@@ -105,7 +105,7 @@ exports.fetchArticleComments = (article_id, limit, p) => {
         comments.votes,
         comments.created_at,
         comments.author,
-        articles.body,
+        comments.body,
         articles.article_id
     FROM comments
     JOIN articles ON comments.article_id = articles.article_id
@@ -116,12 +116,12 @@ exports.fetchArticleComments = (article_id, limit, p) => {
   if (limit) {
     queryString += ` LIMIT ${limit}`;
     if (p > 1) {
-      queryString += ` OFFSET ${(limit + 1) * (p - 1)}`;
+      queryString += ` OFFSET ${limit * (p - 1)}`;
     }
   } else {
     queryString += ` LIMIT 10`;
     if (p > 1) {
-      queryString += ` OFFSET ${(limit + 1) * (p - 1)}`;
+      queryString += ` OFFSET ${10 * (p - 1)}`;
     }
   }
 
