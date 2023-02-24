@@ -1,6 +1,6 @@
 const db = require("../db/connection");
 
-exports.fetchArticles = (topic, sort_by, order) => {
+exports.fetchArticles = (topic, sort_by, order, limit = "10") => {
   const validSortByOptions = [
     "article_id",
     "title",
@@ -11,6 +11,7 @@ exports.fetchArticles = (topic, sort_by, order) => {
     "article_img_url",
   ];
   const validOrderOptions = ["asc", "desc"];
+  const validLimitOptionsRegex = /\d+/;
 
   if (sort_by && !validSortByOptions.includes(sort_by)) {
     return Promise.reject({ status: 400, msg: "Invalid sort by option given" });
@@ -18,6 +19,10 @@ exports.fetchArticles = (topic, sort_by, order) => {
 
   if (order && !validOrderOptions.includes(order)) {
     return Promise.reject({ status: 400, msg: "Invalid order option given" });
+  }
+
+  if (limit && !validLimitOptionsRegex.test(limit)) {
+    return Promise.reject({ status: 400, msg: "Invalid limit option given" });
   }
 
   let queryString = `
@@ -51,6 +56,10 @@ exports.fetchArticles = (topic, sort_by, order) => {
     queryString += ` ${order}`;
   } else {
     queryString += ` DESC`;
+  }
+
+  if (limit) {
+    queryString += ` LIMIT ${limit}`;
   }
 
   return db.query(queryString, queryParams).then(({ rows }) => {

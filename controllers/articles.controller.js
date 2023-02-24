@@ -11,9 +11,9 @@ const {
 } = require("../models/articles.models");
 
 exports.getArticles = (req, res, next) => {
-  const { topic, sort_by, order } = req.query;
+  const { topic, sort_by, order, limit } = req.query;
 
-  const articlesPromise = fetchArticles(topic, sort_by, order);
+  const articlesPromise = fetchArticles(topic, sort_by, order, limit);
   const checkTopic = selectTopic(topic);
 
   Promise.all([articlesPromise, checkTopic])
