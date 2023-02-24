@@ -62,20 +62,20 @@ exports.fetchOneArticle = (article_id) => {
   return db
     .query(
       `
-    SELECT
-      articles.author,
-      articles.title,
-      articles.article_id,
-      articles.body,
-      articles.topic,
-      articles.created_at,
-      articles.votes,
-      articles.article_img_url,
-      COUNT(comments.article_id)::INTEGER AS comment_count
-    FROM articles
-    LEFT JOIN comments ON articles.article_id = comments.article_id
-    WHERE articles.article_id = $1
-    GROUP BY articles.article_id
+      SELECT
+        articles.author,
+        articles.title,
+        articles.article_id,
+        articles.body,
+        articles.topic,
+        articles.created_at,
+        articles.votes,
+        articles.article_img_url,
+        COUNT(comments.article_id)::INTEGER AS comment_count
+      FROM articles
+      LEFT JOIN comments ON articles.article_id = comments.article_id
+      WHERE articles.article_id = $1
+      GROUP BY articles.article_id
     `,
       [article_id]
     )
@@ -88,27 +88,46 @@ exports.fetchOneArticle = (article_id) => {
     });
 };
 
-exports.fetchArticleComments = (article_id) => {
-  return db
-    .query(
-      `
-        SELECT 
-            comments.comment_id,
-            comments.votes,
-            comments.created_at,
-            comments.author,
-            articles.body,
-            articles.article_id
-        FROM comments
-        JOIN articles ON comments.article_id = articles.article_id
-        WHERE articles.article_id = $1
-        ORDER BY comments.created_at DESC
-    `,
-      [article_id]
-    )
-    .then(({ rows }) => {
-      return rows;
-    });
+exports.fetchArticleComments = (article_id, limit, p) => {
+  const validNumericOptionsRegex = /\d+/;
+
+  if (limit && !validNumericOptionsRegex.test(limit)) {
+    return Promise.reject({ status: 400, msg: "Invalid limit option given" });
+  }
+
+  if (p && !validNumericOptionsRegex.test(p)) {
+    return Promise.reject({ status: 400, msg: "Invalid page option given" });
+  }
+
+  let queryString = `
+    SELECT 
+        comments.comment_id,
+        comments.votes,
+        comments.created_at,
+        comments.author,
+        articles.body,
+        articles.article_id
+    FROM comments
+    JOIN articles ON comments.article_id = articles.article_id
+    WHERE articles.article_id = $1
+    ORDER BY comments.created_at DESC
+  `;
+
+  if (limit) {
+    queryString += ` LIMIT ${limit}`;
+    if (p > 1) {
+      queryString += ` OFFSET ${(limit + 1) * (p - 1)}`;
+    }
+  } else {
+    queryString += ` LIMIT 10`;
+    if (p > 1) {
+      queryString += ` OFFSET ${(limit + 1) * (p - 1)}`;
+    }
+  }
+
+  return db.query(queryString, [article_id]).then(({ rows }) => {
+    return rows;
+  });
 };
 
 exports.selectArticleById = (article_id) => {

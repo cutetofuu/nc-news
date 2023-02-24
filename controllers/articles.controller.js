@@ -28,6 +28,7 @@ exports.getArticles = (req, res, next) => {
 
 exports.getOneArticle = (req, res, next) => {
   const { article_id } = req.params;
+
   fetchOneArticle(article_id)
     .then((article) => {
       res.status(200).send({ article });
@@ -39,8 +40,9 @@ exports.getOneArticle = (req, res, next) => {
 
 exports.getArticleComments = (req, res, next) => {
   const { article_id } = req.params;
+  const { limit, p } = req.query;
 
-  const commentsPromise = fetchArticleComments(article_id);
+  const commentsPromise = fetchArticleComments(article_id, limit, p);
   const checkArticle = selectArticleById(article_id);
 
   Promise.all([commentsPromise, checkArticle])
