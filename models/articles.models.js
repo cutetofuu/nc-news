@@ -65,12 +65,12 @@ exports.fetchArticles = (topic, sort_by, order, limit, p) => {
   if (limit) {
     queryString += ` LIMIT ${limit}`;
     if (p > 1) {
-      queryString += ` OFFSET ${(limit + 1) * (p - 1)}`;
+      queryString += ` OFFSET ${limit * (p - 1)}`;
     }
   } else {
     queryString += ` LIMIT 10`;
     if (p > 1) {
-      queryString += ` OFFSET ${11 * (p - 1)}`;
+      queryString += ` OFFSET ${10 * (p - 1)}`;
     }
   }
 

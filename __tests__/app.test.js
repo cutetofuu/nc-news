@@ -279,7 +279,7 @@ describe("articles", () => {
               new Date(articleB.created_at) - new Date(articleA.created_at)
             );
           });
-          const pageTwoArticles = sortedArticles.slice(11, 20);
+          const pageTwoArticles = sortedArticles.slice(10, 20);
           for (let i = 0; i < articles.length; i++) {
             expect(articles[i].title).toEqual(pageTwoArticles[i].title);
             expect(articles[i].author).toEqual(pageTwoArticles[i].author);
@@ -299,7 +299,7 @@ describe("articles", () => {
               new Date(articleB.created_at) - new Date(articleA.created_at)
             );
           });
-          const pageTwoArticles = sortedArticles.slice(6, 11);
+          const pageTwoArticles = sortedArticles.slice(5, 10);
           for (let i = 0; i < articles.length; i++) {
             expect(articles[i].title).toEqual(pageTwoArticles[i].title);
             expect(articles[i].author).toEqual(pageTwoArticles[i].author);
