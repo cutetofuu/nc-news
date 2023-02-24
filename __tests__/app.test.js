@@ -250,12 +250,41 @@ describe("articles", () => {
           }
         });
     });
+    it("200: responds with all the articles, when limit number given > number of available articles", () => {
+      return request(app)
+        .get("/api/articles?limit=20")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles).toHaveLength(12);
+        });
+    });
     it("400: invalid limit query given", () => {
       return request(app)
         .get("/api/articles?limit=invalid_query")
         .expect(400)
         .then(({ body }) => {
           expect(body.msg).toBe("Invalid limit option given");
+        });
+    });
+    it("200: responds with the correct articles when only given a page", () => {
+      return request(app)
+        .get("/api/articles?p=2")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          const copyArticleData = [...testData.articleData];
+          const sortedArticles = copyArticleData.sort((articleA, articleB) => {
+            return (
+              new Date(articleB.created_at) - new Date(articleA.created_at)
+            );
+          });
+          const pageTwoArticles = sortedArticles.slice(11, 20);
+          for (let i = 0; i < articles.length; i++) {
+            expect(articles[i].title).toEqual(pageTwoArticles[i].title);
+            expect(articles[i].author).toEqual(pageTwoArticles[i].author);
+            expect(articles[i].topic).toEqual(pageTwoArticles[i].topic);
+          }
         });
     });
     it("200: responds with the correct articles when given limit and page queries", () => {
@@ -276,6 +305,15 @@ describe("articles", () => {
             expect(articles[i].author).toEqual(pageTwoArticles[i].author);
             expect(articles[i].topic).toEqual(pageTwoArticles[i].topic);
           }
+        });
+    });
+    it("200: responds with an empty array when page number given > number of available articles", () => {
+      return request(app)
+        .get("/api/articles?p=5")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles).toEqual([]);
         });
     });
     it("400: invalid page query given", () => {

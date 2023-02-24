@@ -1,6 +1,6 @@
 const db = require("../db/connection");
 
-exports.fetchArticles = (topic, sort_by, order, limit = "10", p) => {
+exports.fetchArticles = (topic, sort_by, order, limit, p) => {
   const validSortByOptions = [
     "article_id",
     "title",
@@ -64,9 +64,13 @@ exports.fetchArticles = (topic, sort_by, order, limit = "10", p) => {
 
   if (limit) {
     queryString += ` LIMIT ${limit}`;
-
     if (p > 1) {
       queryString += ` OFFSET ${(limit + 1) * (p - 1)}`;
+    }
+  } else {
+    queryString += ` LIMIT 10`;
+    if (p > 1) {
+      queryString += ` OFFSET ${11 * (p - 1)}`;
     }
   }
 
