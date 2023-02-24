@@ -516,7 +516,7 @@ describe("articles", () => {
           expect(body.msg).toBe("Invalid limit option given");
         });
     });
-    it("200: responds with the correct articles when only given a page", () => {
+    it("200: responds with the correct comments when only given a page", () => {
       return request(app)
         .get("/api/articles/1/comments?p=2")
         .expect(200)
