@@ -9,6 +9,17 @@
       "topics": [{ "slug": "football", "description": "Footie!" }]
     }
   },
+  "POST /api/topics": {
+    "description": "posts a new topic, and responds with the new topic",
+    "exampleRequestBody": {
+      "slug": "baking",
+      "description": "I love to bake cookies and banana bread!"
+    },
+    "exampleResponse": {
+      "slug": "baking",
+      "description": "I love to bake cookies and banana bread!"
+    }
+  },
   "GET /api/articles": {
     "description": "serves an array of all topics",
     "queries": ["author", "topic", "sort_by", "order", "limit", "p"],
