@@ -85,6 +85,56 @@ describe("topics", () => {
         });
     });
   });
+  describe("22. POST /api/topics", () => {
+    it("201: responds with an object", () => {
+      const newTopic = {
+        slug: "baking",
+        description: "I love to bake cookies and banana bread!",
+      };
+      return request(app)
+        .post("/api/topics")
+        .send(newTopic)
+        .expect(201)
+        .then(({ body }) => {
+          const { topic } = body;
+          expect(topic).toBeInstanceOf(Object);
+        });
+    });
+    it("201: responds with a topic object with the correct keys", () => {
+      const newTopic = {
+        slug: "baking",
+        description: "I love to bake cookies and banana bread!",
+      };
+      return request(app)
+        .post("/api/topics")
+        .send(newTopic)
+        .expect(201)
+        .then(({ body }) => {
+          const { topic } = body;
+          expect(topic).toMatchObject({
+            slug: expect.any(String),
+            description: expect.any(String),
+          });
+        });
+    });
+    it("201: responds with the topic object that has been sent", () => {
+      const newTopic = {
+        slug: "baking",
+        description: "I love to bake cookies and banana bread!",
+      };
+      return request(app)
+        .post("/api/topics")
+        .send(newTopic)
+        .expect(201)
+        .then(({ body }) => {
+          const { topic } = body;
+          expect(topic).toEqual({
+            slug: "baking",
+            description: "I love to bake cookies and banana bread!",
+          });
+        });
+    });
+  });
 });
 
 describe("articles", () => {
