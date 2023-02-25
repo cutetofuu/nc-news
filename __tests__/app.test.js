@@ -114,6 +114,7 @@ describe("articles", () => {
               votes: expect.any(Number),
               article_img_url: expect.any(String),
               comment_count: expect.any(Number),
+              total_count: expect.any(Number),
             });
           });
         });
@@ -287,7 +288,7 @@ describe("articles", () => {
           }
         });
     });
-    it("200: responds with the correct articles when given limit and page queries", () => {
+    it("200: responds with the correct articles, when limit and page queries given", () => {
       return request(app)
         .get("/api/articles?limit=5&p=2")
         .expect(200)
@@ -322,6 +323,28 @@ describe("articles", () => {
         .expect(400)
         .then(({ body }) => {
           expect(body.msg).toBe("Invalid page option given");
+        });
+    });
+    it("200: responds with the total number of articles, when limit and page queries given", () => {
+      return request(app)
+        .get("/api/articles?limit=5&p=2")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          articles.forEach((article) => {
+            expect(article.total_count).toBe(12);
+          });
+        });
+    });
+    it("200: responds with the correct number of articles, when filtered by topic", () => {
+      return request(app)
+        .get("/api/articles?topic=mitch")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          articles.forEach((article) => {
+            expect(article.total_count).toBe(11);
+          });
         });
     });
   });
@@ -543,7 +566,7 @@ describe("articles", () => {
           }
         });
     });
-    it("200: responds with the correct comments when given limit and page queries", () => {
+    it("200: responds with the correct comments, when limit and page queries given", () => {
       return request(app)
         .get("/api/articles/1/comments?limit=5&p=2")
         .expect(200)
