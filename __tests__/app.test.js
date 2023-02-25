@@ -42,6 +42,7 @@ describe("app", () => {
           expect(parsedFile).toMatchObject({
             "GET /api": expect.any(Object),
             "GET /api/topics": expect.any(Object),
+            "POST /api/topics": expect.any(Object),
             "GET /api/articles": expect.any(Object),
             "GET /api/articles/:article_id": expect.any(Object),
             "GET /api/articles/:article_id/comments": expect.any(Object),
@@ -85,7 +86,8 @@ describe("topics", () => {
         });
     });
   });
-  describe("22. POST /api/topics", () => {
+
+  describe("POST /api/topics", () => {
     it("201: responds with an object", () => {
       const newTopic = {
         slug: "baking",
@@ -132,6 +134,42 @@ describe("topics", () => {
             slug: "baking",
             description: "I love to bake cookies and banana bread!",
           });
+        });
+    });
+    it("200: returned object has a different memory reference to the object sent", () => {
+      const newTopic = {
+        slug: "baking",
+        description: "I love to bake cookies and banana bread!",
+      };
+      return request(app)
+        .post("/api/topics")
+        .send(newTopic)
+        .expect(201)
+        .then(({ body }) => {
+          const { topic } = body;
+          expect(topic).not.toBe(newTopic);
+        });
+    });
+    it("400: missing required fields/empty body given", () => {
+      return request(app)
+        .post("/api/topics")
+        .send({})
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    it("400: invalid topic object given", () => {
+      const newTopic = {
+        slug: undefined,
+        description: "I love to bake cookies and banana bread!",
+      };
+      return request(app)
+        .post("/api/topics")
+        .send(newTopic)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
         });
     });
   });
