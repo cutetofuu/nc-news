@@ -6,7 +6,7 @@ https://nc-news-2yza.onrender.com/api
 
 ## Project Summary
 
-This is an API that simulates the backend service used on a news/article website. It supplies the following information:
+This is an API that simulates the backend service used on a news/article website. It is written using JavaScript, Node.js, Express.js, and uses PostgreSQL as a database. Endpoint testing is done using Jest and SuperTest. It supplies the following information:
 
 1. `articles`
 
