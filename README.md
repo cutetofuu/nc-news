@@ -14,10 +14,12 @@ This is an API that simulates the backend service used on a news/article website
    - shows a specific article, when an article id is given
    - updates the vote count for a specific article
    - posts a new article
+   - deletes an existing article
 
 2. `topics`
 
    - shows a collection of topics
+   - posts a new topic
 
 3. `comments`
 
