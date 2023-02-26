@@ -1,4 +1,4 @@
-# News API
+# NC News API
 
 ## Link to Hosted Version
 
