@@ -44,11 +44,12 @@ describe("app", () => {
             "GET /api/topics": expect.any(Object),
             "POST /api/topics": expect.any(Object),
             "GET /api/articles": expect.any(Object),
+            "POST /api/articles": expect.any(Object),
             "GET /api/articles/:article_id": expect.any(Object),
+            "PATCH /api/articles/:article_id": expect.any(Object),
+            "DELETE /api/articles/:article_id": expect.any(Object),
             "GET /api/articles/:article_id/comments": expect.any(Object),
             "POST /api/articles/:article_id/comments": expect.any(Object),
-            "POST /api/articles": expect.any(Object),
-            "PATCH /api/articles/:article_id": expect.any(Object),
             "GET /api/users": expect.any(Object),
             "GET /api/users/:username": expect.any(Object),
             "DELETE /api/comments/:comment_id": expect.any(Object),
@@ -437,6 +438,136 @@ describe("articles", () => {
     });
   });
 
+  describe("POST /api/articles", () => {
+    it("201: responds with an article object", () => {
+      const newArticle = {
+        author: "butter_bridge",
+        title: "Kate loves her cat Pickle",
+        body: "Kitty ipsum dolor sit amet, shed everywhere shed everywhere stretching attack your ankles chase the red dot, hairball run catnip eat the grass sniff.",
+        topic: "cats",
+        article_img_url:
+          "https://www.pexels.com/photo/brown-and-black-cat-37337/",
+      };
+      return request(app)
+        .post("/api/articles")
+        .send(newArticle)
+        .expect(201)
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article).toBeInstanceOf(Object);
+        });
+    });
+    it("201: responds with an article object with the correct keys", () => {
+      const newArticle = {
+        author: "butter_bridge",
+        title: "Kate loves her cat Pickle",
+        body: "Kitty ipsum dolor sit amet, shed everywhere shed everywhere stretching attack your ankles chase the red dot, hairball run catnip eat the grass sniff.",
+        topic: "cats",
+        article_img_url:
+          "https://www.pexels.com/photo/brown-and-black-cat-37337/",
+      };
+      return request(app)
+        .post("/api/articles")
+        .send(newArticle)
+        .expect(201)
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            body: expect.any(String),
+            topic: expect.any(String),
+            article_img_url: expect.any(String),
+            article_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            comment_count: expect.any(Number),
+          });
+        });
+    });
+    it("201: responds with the article object that has been sent", () => {
+      const newArticle = {
+        author: "butter_bridge",
+        title: "Kate loves her cat Pickle",
+        body: "Kitty ipsum dolor sit amet, shed everywhere shed everywhere stretching attack your ankles chase the red dot, hairball run catnip eat the grass sniff.",
+        topic: "cats",
+        article_img_url:
+          "https://www.pexels.com/photo/brown-and-black-cat-37337/",
+      };
+      return request(app)
+        .post("/api/articles")
+        .send(newArticle)
+        .expect(201)
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article).toEqual({
+            author: "butter_bridge",
+            title: "Kate loves her cat Pickle",
+            body: "Kitty ipsum dolor sit amet, shed everywhere shed everywhere stretching attack your ankles chase the red dot, hairball run catnip eat the grass sniff.",
+            topic: "cats",
+            article_img_url:
+              "https://www.pexels.com/photo/brown-and-black-cat-37337/",
+            article_id: 13,
+            votes: 0,
+            created_at: article.created_at,
+            comment_count: 0,
+          });
+        });
+    });
+    it("201: article_img_url will default if not provided", () => {
+      const newArticle = {
+        author: "butter_bridge",
+        title: "Kate loves her cat Pickle",
+        body: "Kitty ipsum dolor sit amet, shed everywhere shed everywhere stretching attack your ankles chase the red dot, hairball run catnip eat the grass sniff.",
+        topic: "cats",
+      };
+      return request(app)
+        .post("/api/articles")
+        .send(newArticle)
+        .expect(201)
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article).toEqual({
+            author: "butter_bridge",
+            title: "Kate loves her cat Pickle",
+            body: "Kitty ipsum dolor sit amet, shed everywhere shed everywhere stretching attack your ankles chase the red dot, hairball run catnip eat the grass sniff.",
+            topic: "cats",
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            article_id: 13,
+            votes: 0,
+            created_at: article.created_at,
+            comment_count: 0,
+          });
+        });
+    });
+    it("400: missing required fields/empty body given", () => {
+      return request(app)
+        .post("/api/articles")
+        .send({})
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    it("400: invalid article object given", () => {
+      const newArticle = {
+        author: "cutetofuu",
+        title: 5678910534,
+        body: 123456789,
+        topic: "invalid topic",
+        article_img_url: true,
+      };
+      return request(app)
+        .post("/api/articles")
+        .send(newArticle)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+  });
+
   describe("GET /api/articles/:article_id", () => {
     it("200: responds with an object", () => {
       return request(app)
@@ -500,6 +631,157 @@ describe("articles", () => {
         .expect(404)
         .then(({ body }) => {
           expect(body.msg).toBe("No article found");
+        });
+    });
+  });
+
+  describe("PATCH /api/articles/:article_id", () => {
+    it("200: responds with an article object", () => {
+      const newVotes = {
+        inc_votes: 18,
+      };
+      return request(app)
+        .patch("/api/articles/2")
+        .send(newVotes)
+        .expect(200)
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article).toBeInstanceOf(Object);
+        });
+    });
+    it("200: responds with an article object with the correct keys", () => {
+      const newVotes = {
+        inc_votes: 18,
+      };
+      return request(app)
+        .patch("/api/articles/2")
+        .send(newVotes)
+        .expect(200)
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            topic: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+          });
+        });
+    });
+    it("200: responds with an article object with increased votes", () => {
+      const newVotes = {
+        inc_votes: 18,
+      };
+      return request(app)
+        .patch("/api/articles/6")
+        .send(newVotes)
+        .expect(200)
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article).toEqual({
+            article_id: 6,
+            title: "A",
+            topic: "mitch",
+            author: "icellusedkars",
+            body: "Delicious tin of cat food",
+            created_at: article.created_at,
+            votes: 18,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          });
+        });
+    });
+    it("200: responds with an article object with decreased votes", () => {
+      const newVotes = {
+        inc_votes: -38,
+      };
+      return request(app)
+        .patch("/api/articles/1")
+        .send(newVotes)
+        .expect(200)
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article).toEqual({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: article.created_at,
+            votes: 62,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          });
+        });
+    });
+    it("400: missing required fields/empty body given", () => {
+      return request(app)
+        .patch("/api/articles/3")
+        .send({})
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    it("400: invalid votes object sent", () => {
+      const newVotes = {
+        inc_votes: "northcoders",
+      };
+      return request(app)
+        .patch("/api/articles/8")
+        .send(newVotes)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    it("400: invalid article id given", () => {
+      const newVotes = {
+        inc_votes: -38,
+      };
+      return request(app)
+        .patch("/api/articles/pickle")
+        .send(newVotes)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    it("404: valid but non-existent article id given", () => {
+      const newVotes = {
+        inc_votes: 18,
+      };
+      return request(app)
+        .patch("/api/articles/860")
+        .send(newVotes)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("No article found");
+        });
+    });
+  });
+
+  describe("DELETE /api/articles/:article_id", () => {
+    it("204: deletes an article and its associated comments from the database", () => {
+      return request(app).delete("/api/articles/5").expect(204);
+    });
+    it("400: invalid article id given", () => {
+      return request(app)
+        .delete("/api/articles/invalid_id")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad Request");
+        });
+    });
+    it("404: valid but non-existent article id given", () => {
+      return request(app)
+        .delete("/api/articles/3000")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Article not found");
         });
     });
   });
@@ -816,265 +1098,6 @@ describe("articles", () => {
         .expect(404)
         .then(({ body }) => {
           expect(body.msg).toBe("Username does not exist");
-        });
-    });
-  });
-
-  describe("POST /api/articles", () => {
-    it("201: responds with an article object", () => {
-      const newArticle = {
-        author: "butter_bridge",
-        title: "Kate loves her cat Pickle",
-        body: "Kitty ipsum dolor sit amet, shed everywhere shed everywhere stretching attack your ankles chase the red dot, hairball run catnip eat the grass sniff.",
-        topic: "cats",
-        article_img_url:
-          "https://www.pexels.com/photo/brown-and-black-cat-37337/",
-      };
-      return request(app)
-        .post("/api/articles")
-        .send(newArticle)
-        .expect(201)
-        .then(({ body }) => {
-          const { article } = body;
-          expect(article).toBeInstanceOf(Object);
-        });
-    });
-    it("201: responds with an article object with the correct keys", () => {
-      const newArticle = {
-        author: "butter_bridge",
-        title: "Kate loves her cat Pickle",
-        body: "Kitty ipsum dolor sit amet, shed everywhere shed everywhere stretching attack your ankles chase the red dot, hairball run catnip eat the grass sniff.",
-        topic: "cats",
-        article_img_url:
-          "https://www.pexels.com/photo/brown-and-black-cat-37337/",
-      };
-      return request(app)
-        .post("/api/articles")
-        .send(newArticle)
-        .expect(201)
-        .then(({ body }) => {
-          const { article } = body;
-          expect(article).toMatchObject({
-            author: expect.any(String),
-            title: expect.any(String),
-            body: expect.any(String),
-            topic: expect.any(String),
-            article_img_url: expect.any(String),
-            article_id: expect.any(Number),
-            votes: expect.any(Number),
-            created_at: expect.any(String),
-            comment_count: expect.any(Number),
-          });
-        });
-    });
-    it("201: responds with the article object that has been sent", () => {
-      const newArticle = {
-        author: "butter_bridge",
-        title: "Kate loves her cat Pickle",
-        body: "Kitty ipsum dolor sit amet, shed everywhere shed everywhere stretching attack your ankles chase the red dot, hairball run catnip eat the grass sniff.",
-        topic: "cats",
-        article_img_url:
-          "https://www.pexels.com/photo/brown-and-black-cat-37337/",
-      };
-      return request(app)
-        .post("/api/articles")
-        .send(newArticle)
-        .expect(201)
-        .then(({ body }) => {
-          const { article } = body;
-          expect(article).toEqual({
-            author: "butter_bridge",
-            title: "Kate loves her cat Pickle",
-            body: "Kitty ipsum dolor sit amet, shed everywhere shed everywhere stretching attack your ankles chase the red dot, hairball run catnip eat the grass sniff.",
-            topic: "cats",
-            article_img_url:
-              "https://www.pexels.com/photo/brown-and-black-cat-37337/",
-            article_id: 13,
-            votes: 0,
-            created_at: article.created_at,
-            comment_count: 0,
-          });
-        });
-    });
-    it("201: article_img_url will default if not provided", () => {
-      const newArticle = {
-        author: "butter_bridge",
-        title: "Kate loves her cat Pickle",
-        body: "Kitty ipsum dolor sit amet, shed everywhere shed everywhere stretching attack your ankles chase the red dot, hairball run catnip eat the grass sniff.",
-        topic: "cats",
-      };
-      return request(app)
-        .post("/api/articles")
-        .send(newArticle)
-        .expect(201)
-        .then(({ body }) => {
-          const { article } = body;
-          expect(article).toEqual({
-            author: "butter_bridge",
-            title: "Kate loves her cat Pickle",
-            body: "Kitty ipsum dolor sit amet, shed everywhere shed everywhere stretching attack your ankles chase the red dot, hairball run catnip eat the grass sniff.",
-            topic: "cats",
-            article_img_url:
-              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-            article_id: 13,
-            votes: 0,
-            created_at: article.created_at,
-            comment_count: 0,
-          });
-        });
-    });
-    it("400: missing required fields/empty body given", () => {
-      return request(app)
-        .post("/api/articles")
-        .send({})
-        .expect(400)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Bad Request");
-        });
-    });
-    it("400: invalid article object given", () => {
-      const newArticle = {
-        author: "cutetofuu",
-        title: 5678910534,
-        body: 123456789,
-        topic: "invalid topic",
-        article_img_url: true,
-      };
-      return request(app)
-        .post("/api/articles")
-        .send(newArticle)
-        .expect(400)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Bad Request");
-        });
-    });
-  });
-
-  describe("PATCH /api/articles/:article_id", () => {
-    it("200: responds with an article object", () => {
-      const newVotes = {
-        inc_votes: 18,
-      };
-      return request(app)
-        .patch("/api/articles/2")
-        .send(newVotes)
-        .expect(200)
-        .then(({ body }) => {
-          const { article } = body;
-          expect(article).toBeInstanceOf(Object);
-        });
-    });
-    it("200: responds with an article object with the correct keys", () => {
-      const newVotes = {
-        inc_votes: 18,
-      };
-      return request(app)
-        .patch("/api/articles/2")
-        .send(newVotes)
-        .expect(200)
-        .then(({ body }) => {
-          const { article } = body;
-          expect(article).toMatchObject({
-            article_id: expect.any(Number),
-            title: expect.any(String),
-            topic: expect.any(String),
-            author: expect.any(String),
-            body: expect.any(String),
-            created_at: expect.any(String),
-            votes: expect.any(Number),
-            article_img_url: expect.any(String),
-          });
-        });
-    });
-    it("200: responds with an article object with increased votes", () => {
-      const newVotes = {
-        inc_votes: 18,
-      };
-      return request(app)
-        .patch("/api/articles/6")
-        .send(newVotes)
-        .expect(200)
-        .then(({ body }) => {
-          const { article } = body;
-          expect(article).toEqual({
-            article_id: 6,
-            title: "A",
-            topic: "mitch",
-            author: "icellusedkars",
-            body: "Delicious tin of cat food",
-            created_at: article.created_at,
-            votes: 18,
-            article_img_url:
-              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-          });
-        });
-    });
-    it("200: responds with an article object with decreased votes", () => {
-      const newVotes = {
-        inc_votes: -38,
-      };
-      return request(app)
-        .patch("/api/articles/1")
-        .send(newVotes)
-        .expect(200)
-        .then(({ body }) => {
-          const { article } = body;
-          expect(article).toEqual({
-            article_id: 1,
-            title: "Living in the shadow of a great man",
-            topic: "mitch",
-            author: "butter_bridge",
-            body: "I find this existence challenging",
-            created_at: article.created_at,
-            votes: 62,
-            article_img_url:
-              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-          });
-        });
-    });
-    it("400: missing required fields/empty body given", () => {
-      return request(app)
-        .patch("/api/articles/3")
-        .send({})
-        .expect(400)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Bad Request");
-        });
-    });
-    it("400: invalid votes object sent", () => {
-      const newVotes = {
-        inc_votes: "northcoders",
-      };
-      return request(app)
-        .patch("/api/articles/8")
-        .send(newVotes)
-        .expect(400)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Bad Request");
-        });
-    });
-    it("400: invalid article id given", () => {
-      const newVotes = {
-        inc_votes: -38,
-      };
-      return request(app)
-        .patch("/api/articles/pickle")
-        .send(newVotes)
-        .expect(400)
-        .then(({ body }) => {
-          expect(body.msg).toBe("Bad Request");
-        });
-    });
-    it("404: valid but non-existent article id given", () => {
-      const newVotes = {
-        inc_votes: 18,
-      };
-      return request(app)
-        .patch("/api/articles/860")
-        .send(newVotes)
-        .expect(404)
-        .then(({ body }) => {
-          expect(body.msg).toBe("No article found");
         });
     });
   });
