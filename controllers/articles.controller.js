@@ -8,6 +8,8 @@ const {
   updateArticle,
   selectTopic,
   addArticle,
+  removeArticle,
+  removeCommentByArticleId,
 } = require("../models/articles.models");
 
 exports.getArticles = (req, res, next) => {
@@ -89,6 +91,7 @@ exports.patchArticle = (req, res, next) => {
 
 exports.postArticle = (req, res, next) => {
   const newArticle = req.body;
+
   addArticle(newArticle)
     .then((result) => {
       const { article_id } = result;
@@ -96,6 +99,21 @@ exports.postArticle = (req, res, next) => {
     })
     .then((article) => {
       res.status(201).send({ article });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.deleteArticle = (req, res, next) => {
+  const { article_id } = req.params;
+
+  removeCommentByArticleId(article_id)
+    .then(() => {
+      return removeArticle(article_id);
+    })
+    .then(() => {
+      res.status(204).send();
     })
     .catch((err) => {
       next(err);
