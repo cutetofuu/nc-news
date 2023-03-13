@@ -6,6 +6,9 @@ const {
   handleCustomErrors,
   handle500Statuses,
 } = require("./controllers/error-handling.controller");
+const cors = require("cors");
+
+app.use(cors());
 
 const app = express();
 
